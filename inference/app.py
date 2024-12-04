@@ -42,7 +42,7 @@ def predict():
 
         # Process the decoded message
         # Assuming it's JSON
-        features = json.loads(decoded_data)
+        features = json.loads(decoded_data)['features']
         
         # Run prediction
         prediction = model.predict([features])
