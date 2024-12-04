@@ -55,45 +55,40 @@ model = lgb.Booster(model_file=MODEL_PATH)
 # TODO: take into account properly converting the categorical data
 @app.route("/predict", methods=["POST"])
 def predict():
-    try:
-        # Get the Pub/Sub message
-        envelope = request.get_json()
-        
-        # Check if the message is valid
-        if not envelope or 'message' not in envelope:
-            logging.log("invalid message format")
-            return jsonify({'error': 'Invalid message format'}), 400
-
-        # Decode the message data
-        data = envelope['message']['data']
-        decoded_data = base64.b64decode(data).decode('utf-8')
-
-        # Process the decoded message
-        # Assuming it's JSON
-        features = json.loads(decoded_data)['features']
-        if 'features' not in features or len(features['features']) != len(FEATURE_COLUMNS):
-            return jsonify({'error': 'Feature length mismatch'}), 400
-        
-        # Run prediction
-        prediction = model.predict([features])
-        
-        # Combine features with the prediction
-        result = dict(zip(FEATURE_COLUMNS, features['features']))
-        result['prediction'] = prediction
-
-        # Save result to an Avro file
-        blob_name = 'predictions/prediction.avro'
-
-        # Convert to a list (Avro expects a list of records)
-        save_to_avro(BUCKET_NAME, blob_name, [result], AVRO_SCHEMA)
-
-        # Return the response
-        logging.log(f"Prediction saved to GCS; prediction: {prediction}")
-        return jsonify({'message': 'Prediction saved to GCS', 'prediction': prediction}), 200
+    # Get the Pub/Sub message
+    envelope = request.get_json()
     
-    except Exception as e:
-        logging.log(str(e))
-        return jsonify({"error": str(e)}), 400
+    # Check if the message is valid
+    if not envelope or 'message' not in envelope:
+        logging.log("invalid message format")
+        return jsonify({'error': 'Invalid message format'}), 400
+
+    # Decode the message data
+    data = envelope['message']['data']
+    decoded_data = base64.b64decode(data).decode('utf-8')
+
+    # Process the decoded message
+    # Assuming it's JSON
+    features = json.loads(decoded_data)['features']
+    if 'features' not in features or len(features['features']) != len(FEATURE_COLUMNS):
+        return jsonify({'error': 'Feature length mismatch'}), 400
+    
+    # Run prediction
+    prediction = model.predict([features])
+    
+    # Combine features with the prediction
+    result = dict(zip(FEATURE_COLUMNS, features['features']))
+    result['prediction'] = prediction
+
+    # Save result to an Avro file
+    blob_name = 'predictions/prediction.avro'
+
+    # Convert to a list (Avro expects a list of records)
+    save_to_avro(BUCKET_NAME, blob_name, [result], AVRO_SCHEMA)
+
+    # Return the response
+    logging.log(f"Prediction saved to GCS; prediction: {prediction}")
+    return jsonify({'message': 'Prediction saved to GCS', 'prediction': prediction}), 200
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=8080)
