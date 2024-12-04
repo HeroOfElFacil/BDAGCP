@@ -7,6 +7,11 @@ import fastavro
 from google.cloud import storage
 import os
 from io import BytesIO
+# Set up logging configuration
+logging.basicConfig(
+    level=logging.INFO,  # Log level (DEBUG, INFO, WARNING, ERROR, CRITICAL)
+    format='%(asctime)s - %(levelname)s - %(message)s'  # Log format
+)
 
 app = Flask(__name__)
 
@@ -60,7 +65,7 @@ def predict():
     
     # Check if the message is valid
     if not envelope or 'message' not in envelope:
-        logging.log("invalid message format")
+        logging.error("invalid message format")
         return jsonify({'error': 'Invalid message format'}), 400
 
     # Decode the message data
@@ -85,7 +90,7 @@ def predict():
     save_to_avro(BUCKET_NAME, blob_name, [result], AVRO_SCHEMA)
 
     # Return the response
-    logging.log(f"Prediction saved to GCS; prediction: {prediction}")
+    logging.info(f"Prediction saved to GCS; prediction: {prediction}")
     return jsonify({'message': 'Prediction saved to GCS', 'prediction': prediction}), 200
 
 if __name__ == "__main__":
