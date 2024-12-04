@@ -2,6 +2,7 @@ from flask import Flask, request, jsonify
 import lightgbm as lgb
 import base64
 import json
+import logging
 from google.cloud import storage
 import os
 
@@ -32,6 +33,7 @@ def predict():
         
         # Check if the message is valid
         if not envelope or 'message' not in envelope:
+            logging.log("invalid message format")
             return jsonify({'error': 'Invalid message format'}), 400
 
         # Decode the message data
@@ -45,8 +47,9 @@ def predict():
         # Run prediction
         prediction = model.predict([features])
         
-        return jsonify({"prediction": prediction.tolist()})
+        return jsonify({"prediction": prediction.tolist()}), 200
     except Exception as e:
+        logging.log("str(e)")
         return jsonify({"error": str(e)}), 400
 
 if __name__ == "__main__":
