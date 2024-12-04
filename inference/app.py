@@ -70,8 +70,6 @@ def predict():
     # Process the decoded message
     # Assuming it's JSON
     features = json.loads(decoded_data)['features']
-    if 'features' not in features or len(features['features']) != len(FEATURE_COLUMNS):
-        return jsonify({'error': 'Feature length mismatch'}), 400
     
     # Run prediction
     prediction = model.predict([features])
