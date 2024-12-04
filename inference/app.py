@@ -91,7 +91,7 @@ def predict():
 
     # Return the response
     logging.info(f"Prediction saved to GCS; prediction: {prediction}")
-    return jsonify({'message': 'Prediction saved to GCS', 'prediction': prediction}), 200
+    return jsonify({'message': 'Prediction saved to GCS', 'prediction': prediction.tolist()}), 200
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=8080)
