@@ -1,5 +1,7 @@
 from flask import Flask, request, jsonify
 import lightgbm as lgb
+import base64
+import json
 from google.cloud import storage
 import os
 
@@ -25,9 +27,20 @@ model = lgb.Booster(model_file=MODEL_PATH)
 @app.route("/predict", methods=["POST"])
 def predict():
     try:
-        # Parse JSON input
-        data = request.get_json()
-        features = data["features"]
+        # Get the Pub/Sub message
+        envelope = request.get_json()
+        
+        # Check if the message is valid
+        if not envelope or 'message' not in envelope:
+            return jsonify({'error': 'Invalid message format'}), 400
+
+        # Decode the message data
+        data = envelope['message']['data']
+        decoded_data = base64.b64decode(data).decode('utf-8')
+
+        # Process the decoded message
+        # Assuming it's JSON
+        features = json.loads(decoded_data)
         
         # Run prediction
         prediction = model.predict([features])
