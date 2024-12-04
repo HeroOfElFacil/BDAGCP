@@ -75,7 +75,7 @@ def predict():
     prediction = model.predict([features])
     
     # Combine features with the prediction
-    result = dict(zip(FEATURE_COLUMNS, features['features']))
+    result = dict(zip(FEATURE_COLUMNS, features))
     result['prediction'] = prediction
 
     # Save result to an Avro file
