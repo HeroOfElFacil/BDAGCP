@@ -11,9 +11,9 @@ from io import BytesIO
 app = Flask(__name__)
 
 # List of feature columns
-FEATURE_COLUMNS = ['trp_lat', 'trp_lon', 'air_temperature', 'precipitation_rate',
-       'relative_humidity', 'wind_from_direction', 'wind_speed',
-       'wind_speed_of_gust', 'totalvolume', 'sin_measurement_time',
+FEATURE_COLUMNS = ['trp_lat', 'trp_lon', 'air_temperature', 
+        'precipitation_rate', 'relative_humidity', 'wind_from_direction', 
+       'wind_speed', 'wind_speed_of_gust', 'sin_measurement_time',
        'cos_measurement_time']
 
 # Define the Avro schema
